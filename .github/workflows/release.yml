@@ -53,16 +53,16 @@ jobs:
         id: release_version
         run: echo "value=${GITHUB_REF:11}" >> $GITHUB_OUTPUT
       - name: '⚙️ Run pre-release'
-        uses: apache/grails-github-actions/pre-release@asf
+        uses: ./.github/actions/pre-release
         env:
           RELEASE_VERSION: ${{ steps.release_version.outputs.value }}
           RELEASE_SCRIPT_PATH: '.github/scripts/setReleasedGrailsVersion.sh'
   release:
-    environment: release
     needs: publish
     runs-on: ubuntu-latest
     permissions:
-      contents: read # limit to read access
+      contents: write #post release access needed
+      issues: write # to close out milestones
     steps:
       - name: "📥 Checkout repository"
         uses: actions/checkout@v4
@@ -77,6 +77,6 @@ jobs:
           distribution: liberica
           java-version: 17
       - name: "⚙️ Run post-release"
-        uses: apache/grails-github-actions/post-release@asf
+        uses: ./.github/actions/post-release
         env:
           RELEASE_SCRIPT_PATH: '.github/scripts/setSnapshotGrailsVersion.sh'
